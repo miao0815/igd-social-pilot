@@ -1,0 +1,12 @@
+:root { --ink:#172033; --muted:#687189; --brand:#3157d5; --panel:#f7f8fc; }
+body { background:#eef1f7; color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+.jspsych-content { max-width:900px; }
+.card { background:white; border-radius:18px; padding:34px; box-shadow:0 12px 40px rgba(28,39,74,.09); text-align:left; }
+.eyebrow { color:var(--brand); font-weight:700; letter-spacing:.08em; font-size:14px; }
+.scene { font-size:24px; line-height:1.65; margin:20px 0; }
+.question { font-size:21px; font-weight:700; margin:24px 0 16px; }
+.hint,.small { color:var(--muted); font-size:15px; line-height:1.6; }
+.jspsych-btn { min-width:190px; margin:8px!important; padding:14px 18px!important; border:0!important; border-radius:12px!important; background:var(--brand)!important; color:white!important; font-size:17px!important; }
+.progress { color:var(--muted); font-size:14px; text-align:right; }
+input[type=text],input[type=number] { width:100%; box-sizing:border-box; padding:11px; margin:7px 0 15px; border:1px solid #ccd2e0; border-radius:8px; font-size:16px; }
+@media(max-width:620px){ .card{padding:22px}.scene{font-size:20px}.jspsych-btn{min-width:90%;} }
