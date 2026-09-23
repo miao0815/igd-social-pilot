@@ -1,6 +1,19 @@
-const VERSION="pilot-v3.0-2026-09-20";
-const jsPsych=initJsPsych({on_finish:()=>{const id=jsPsych.data.get().values()[0]?.participant_id||"unknown";jsPsych.data.get().localSave("csv",`IGD_social_V3_${id}_${Date.now()}.csv`);document.body.innerHTML=`<main class="card" style="max-width:720px;margin:8vh auto"><h2>试测完成</h2><p>数据文件已下载，请将CSV文件发给研究者。</p><p class="small">感谢你帮助我们改进材料和程序。</p></main>`;}});
-const pid=jsPsych.randomization.randomID(10);
+const VERSION="pilot-v3.2-datapipe-2026-09-23";
+let pid="pending";
+const jsPsych=initJsPsych({
+  extensions:[{
+    type:jsPsychExtensionPipe,
+    params:{
+      experiment_id:"RCeel1NkjhGd",
+      filename:()=>`IGD_social_V3_${pid}.csv`
+    }
+  }],
+  on_finish:()=>{
+    document.body.innerHTML=`<main class="card" style="max-width:720px;margin:8vh auto"><h2>试测完成</h2><p>数据已自动提交，感谢你帮助我们改进材料和程序。</p><p class="small">被试编号：${pid}</p><button id="backup-download" class="jspsych-btn">备用：下载本地数据</button><p class="small">只有研究者要求时才需要点击备用下载。</p></main>`;
+    document.getElementById("backup-download").addEventListener("click",()=>jsPsych.data.get().localSave("csv",`IGD_social_V3_${pid}_backup.csv`));
+  }
+});
+pid=jsPsych.randomization.randomID(10);
 jsPsych.data.addProperties({participant_id:pid,experiment_version:VERSION,started_at:new Date().toISOString(),user_agent:navigator.userAgent});
 
 // 模块一：不同日常需要/机会中的活动选择。social仅为后台编码，不向被试显示。
@@ -67,6 +80,6 @@ timeline.push({type:jsPsychSurveyLikert,preamble:`<div class="card"><h2>游戏�
 const real=["我通常能从现实中的朋友那里获得陪伴。","遇到事情时，我愿意联系现实中认识的人。","我在现实群体中通常能感到自己是其中一员。","和现实中的人相处时，我一般能够自然表达自己。","我拥有可以稳定联系的现实朋友。","现实中的人际关系能够满足我的社交需要。"];
 timeline.push({type:jsPsychSurveyLikert,preamble:`<div class="card"><h2>日常关系体验</h2><p>以下是试测题目，请按实际情况作答。</p></div>`,questions:real.map((prompt,i)=>({prompt,labels:a5,required:true,name:`real${i+1}`})),button_label:"继续",data:{phase:"questionnaire",scale:"custom_real_social_connection"},on_finish:d=>d.real_total=Object.values(d.response).map(x=>Number(x)+1).reduce((a,b)=>a+b,0)});
 
-timeline.push({type:jsPsychSurveyHtmlForm,preamble:`<div class="card"><h2>最后一个问题</h2></div>`,html:`<label>你对情境、选项或程序还有什么建议？</label><textarea name="final_feedback" rows="5"></textarea>`,button_label:"提交并下载数据",data:{phase:"final_feedback"}});
-timeline.push({type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><h2>谢谢参与</h2><p>点击下方按钮后将下载本次试测数据。</p></div>`,choices:["下载数据"],data:{phase:"end"}});
+timeline.push({type:jsPsychSurveyHtmlForm,preamble:`<div class="card"><h2>最后一个问题</h2></div>`,html:`<label>你对情境、选项或程序还有什么建议？</label><textarea name="final_feedback" rows="5"></textarea>`,button_label:"继续",data:{phase:"final_feedback"}});
+timeline.push({type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><h2>谢谢参与</h2><p>点击下方按钮提交本次试测数据。提交后请不要立即关闭页面。</p></div>`,choices:["提交数据"],data:{phase:"end"}});
 jsPsych.run(timeline);
