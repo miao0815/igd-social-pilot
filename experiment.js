@@ -1,10 +1,10 @@
-const VERSION="pilot-v3.2-datapipe-2026-09-23";
+const VERSION="pilot-v3.2.1-datapipe-2026-09-23";
 let pid="pending";
 const jsPsych=initJsPsych({
   extensions:[{
     type:jsPsychExtensionPipe,
     params:{
-      experiment_id:"RCeel1NkjhGd",
+      experiment_id:"RCeel1NkihGd",
       filename:()=>`IGD_social_V3_${pid}.csv`
     }
   }],
