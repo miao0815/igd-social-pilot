@@ -1,85 +1,55 @@
-const VERSION="pilot-v3.2.1-datapipe-2026-09-23";
-let pid="pending";
-const jsPsych=initJsPsych({
-  extensions:[{
-    type:jsPsychExtensionPipe,
-    params:{
-      experiment_id:"RCeel1NkihGd",
-      filename:()=>`IGD_social_V3_${pid}.csv`
-    }
-  }],
-  on_finish:()=>{
-    document.body.innerHTML=`<main class="card" style="max-width:720px;margin:8vh auto"><h2>试测完成</h2><p>数据已自动提交，感谢你帮助我们改进材料和程序。</p><p class="small">被试编号：${pid}</p><button id="backup-download" class="jspsych-btn">备用：下载本地数据</button><p class="small">只有研究者要求时才需要点击备用下载。</p></main>`;
-    document.getElementById("backup-download").addEventListener("click",()=>jsPsych.data.get().localSave("csv",`IGD_social_V3_${pid}_backup.csv`));
-  }
-});
-pid=jsPsych.randomization.randomID(10);
-jsPsych.data.addProperties({participant_id:pid,experiment_version:VERSION,started_at:new Date().toISOString(),user_agent:navigator.userAgent});
-
-// 模块一：不同日常需要/机会中的活动选择。social仅为后台编码，不向被试显示。
-const dailyCritical=[
-{id:"A01",need:"positive_share",text:"你刚得知自己申请的项目通过了，心情很好。晚上回到寝室后，你暂时没有其他安排。",options:[["自己看部电影",0,"solo_movie"],["听音乐放松",0,"solo_music"],["约朋友庆祝",1,"meet_friend"],["给朋友发消息",1,"message_friend"]]},
-{id:"A02",need:"companionship",text:"周末下午，你已经完成了当天的事情，接下来有两个小时空闲时间。",options:[["独自逛逛",0,"solo_walk"],["回去休息",0,"solo_rest"],["约同学见面",1,"meet_friend"],["去线上找熟人",1,"online_contact"]]},
-{id:"A03",need:"advice",text:"选课时，你在两门课程之间犹豫，查过资料后还是拿不定主意。",options:[["再自己查资料",0,"solo_search"],["先放一放再决定",0,"delay"],["问身边的同学",1,"ask_peer"],["在线咨询熟人",1,"ask_online"]]},
-{id:"A04",need:"belonging",text:"学院发布了一项自由参加的周末活动，内容比较轻松，你也有时间。",options:[["留出时间休息",0,"solo_rest"],["做自己的兴趣活动",0,"solo_hobby"],["约同学一起报名",1,"join_friend"],["进活动群了解",1,"join_online"]]},
-{id:"A05",need:"cooperation",text:"老师布置了一项开放作业，可以独立完成，也可以和别人讨论后再做。",options:[["自己直接完成",0,"solo_task"],["先独立列提纲",0,"solo_plan"],["找同学当面讨论",1,"discuss_face"],["在线和同学讨论",1,"discuss_online"]]},
-{id:"A06",need:"interest_share",text:"你看到一条很有意思的内容，正好与最近关注的话题有关。",options:[["自己收藏下来",0,"solo_save"],["继续看相关内容",0,"solo_browse"],["转给现实朋友",1,"share_friend"],["发到熟人群里",1,"share_group"]]},
-{id:"A07",need:"relaxation",text:"一周的课程结束了。你有些累，但精神还不错，晚上可以自由安排。",options:[["一个人早点休息",0,"solo_rest"],["独自做点喜欢的事",0,"solo_hobby"],["找朋友一起吃饭",1,"dinner_friend"],["和熟人线上聊天",1,"chat_online"]]},
-{id:"A08",need:"new_environment",text:"你提前到达一场公开活动，现场已有一些认识和不认识的同学，活动还要过一会儿才开始。",options:[["自己看看手机",0,"solo_phone"],["找位置安静等待",0,"solo_wait"],["和认识的人打招呼",1,"greet_friend"],["和身边的人聊聊",1,"talk_nearby"]]},
-{id:"A09",need:"support",text:"你最近准备一项重要任务，进展还可以，但有些细节让你不太确定。",options:[["自己继续琢磨",0,"solo_think"],["休息后再处理",0,"delay"],["找熟悉的人商量",1,"consult_friend"],["在线向同学请教",1,"consult_online"]]},
-{id:"A10",need:"leisure",text:"晚饭后，原定的安排临时取消了。天气不错，第二天也没有早课。",options:[["自己出去走走",0,"solo_walk"],["回寝室看视频",0,"solo_video"],["约朋友一起散步",1,"walk_friend"],["问熟人是否有空",1,"contact_friend"]]},
-{id:"A11",need:"achievement",text:"你终于完成了一件花了很长时间的事情，结果也达到了自己的预期。",options:[["独自休息一下",0,"solo_rest"],["买点喜欢的东西",0,"solo_reward"],["和朋友分享结果",1,"share_friend"],["在熟人群里说一声",1,"share_group"]]},
-{id:"A12",need:"casual_contact",text:"午饭后离下一节课还有四十分钟，你已经处理完需要回复的消息。",options:[["找地方眯一会儿",0,"solo_rest"],["戴耳机听音乐",0,"solo_music"],["找同学坐一会儿",1,"sit_friend"],["在线和熟人聊聊",1,"chat_online"]]}
-];
-const dailyFillers=[
-{id:"F01",text:"下午突然下雨，原定的户外安排取消了，你已经回到室内。",options:[["整理课程资料","organize"],["看一部电影","movie"],["做室内运动","exercise"],["提前处理作业","study"]]},
-{id:"F02",text:"你乘坐的公交车遇到拥堵，预计还要二十分钟才能到达。",options:[["听音乐","music"],["闭目休息","rest"],["看看新闻","news"],["整理日程","planning"]]},
-{id:"F03",text:"你比预期更早完成了今天的任务，离睡觉还有一段时间。",options:[["收拾房间","clean"],["预习课程","study"],["看看视频","video"],["早点休息","rest"]]},
-{id:"F04",text:"你在整理物品时发现一本很久没翻过的书，今晚没有其他安排。",options:[["读几页书","reading"],["继续收拾","clean"],["先放回原处","replace"],["做原定的事","routine"]]},
-{id:"F05",text:"原定的讲座推迟了四十分钟，你已经到达附近，不方便回去。",options:[["在附近散步","walk"],["找地方自习","study"],["去商店看看","shopping"],["坐着休息","rest"]]},
-{id:"F06",text:"明天上午的安排临时取消了，今晚可以比原计划晚一点休息。",options:[["继续个人兴趣","hobby"],["整理下周计划","planning"],["看一集节目","video"],["仍然按时睡觉","sleep"]]}
-];
-
-// 模块二：明确在“准备玩游戏”时选择伙伴，测游戏关系来源，不再使用含糊的“互动”。
-const gameTrials=[
-{id:"G01",context:"今晚你准备玩一会儿自己熟悉的多人游戏，时间比较充足。",question:"你最可能怎么开始？",options:[["自己先玩","solo_game"],["叫现实朋友","real_friend"],["找固定游戏好友","game_friend"],["直接随机匹配","stranger"]]},
-{id:"G02",context:"游戏里开放了一项需要多人配合的新活动，你想体验一下。",question:"你会优先选择谁一起完成？",options:[["尝试单人完成","solo_game"],["邀请现实朋友","real_friend"],["联系固定队友","game_friend"],["临时招募玩家","stranger"]]},
-{id:"G03",context:"你想认真完成几局排位赛，希望队友之间能够配合。",question:"你更可能采用哪种方式？",options:[["自己单排","solo_game"],["约现实朋友组队","real_friend"],["找熟悉游戏好友","game_friend"],["系统随机匹配","stranger"]]},
-{id:"G04",context:"你刚开始玩一款新的多人游戏，对玩法还不太熟悉。",question:"接下来你更可能怎么做？",options:[["自己慢慢摸索","solo_game"],["问现实朋友一起玩","real_friend"],["找游戏好友带一带","game_friend"],["加入陌生人队伍","stranger"]]},
-{id:"G05",context:"周末晚上，你想轻松玩一会儿游戏，不追求排名或奖励。",question:"你会怎样安排？",options:[["自己随便玩玩","solo_game"],["叫现实朋友上线","real_friend"],["找常玩的游戏好友","game_friend"],["进入公开房间","stranger"]]},
-{id:"G06",context:"你有一段时间没有上线，今天重新进入以前常玩的多人游戏。",question:"你最可能先做什么？",options:[["独自熟悉操作","solo_game"],["问现实朋友玩不玩","real_friend"],["联系以前的游戏好友","game_friend"],["直接开始匹配","stranger"]]}
-];
-const gameFillers=[
-{id:"GF01",context:"你准备体验一款刚下载的游戏，可以先选择不同的游戏模式。",question:"你最想先体验哪种？",options:[["剧情模式","story"],["探索模式","explore"],["挑战模式","challenge"],["教学模式","tutorial"]]},
-{id:"GF02",context:"游戏更新后增加了几项新内容，而你今天只有半小时空闲时间。",question:"你会优先做什么？",options:[["查看更新说明","update"],["调整操作设置","settings"],["体验新地图","map"],["完成日常任务","daily"]]}
-];
-
+'use strict';
+const VERSION='V4-review-2026-09-24';
+// Review-only build: intentionally no DataPipe extension or network save request.
+// Existing production experiment RCeel1NkihGd is not changed by this package.
+const state={multi:false,g12:false,g3:false,relations:false,reference:'',complete:false};
+const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const jsPsych=initJsPsych({display_element:'experiment',on_finish:()=>{
+ const root=document.getElementById('experiment');
+ root.innerHTML=`<div class="jspsych-content" style="margin:auto"><div class="card"><h2>${state.complete?'审阅流程已完成':'已退出审阅'}</h2><p>本版没有向 DataPipe 或 Google Drive 上传任何作答。部分量表仍待补齐，完成本流程不代表完成正式实验。</p><p>如需把意见交给研究者，请下载本地文件并自行发送。关闭页面后，未下载的数据无法从后台找回。</p><div class="end-actions"><button class="jspsych-btn" id="csv">下载审阅 CSV</button><button class="jspsych-btn" id="json">下载审阅 JSON</button></div><p class="small">版本：${VERSION}</p></div></div>`;
+ document.getElementById('csv').onclick=()=>jsPsych.data.get().localSave('csv',`IGD_${VERSION}_${pid}.csv`);
+ document.getElementById('json').onclick=()=>jsPsych.data.get().localSave('json',`IGD_${VERSION}_${pid}.json`);
+}});
+const pid=jsPsych.randomization.randomID(10);
+jsPsych.data.addProperties({participant_id:pid,experiment_version:VERSION,review_only:1,formal_collection_ready:0,session_complete:0,upload_status:'disabled_review',started_at:new Date().toISOString(),viewport_width:window.innerWidth,viewport_height:window.innerHeight});
+const base=(module,construct='')=>({module,construct,is_filler:0,applicable:1});
+const card=(title,body)=>`<div class="card"><h2>${title}</h2>${body}</div>`;
+const info=(title,body,data={},label='继续')=>({type:jsPsychHtmlButtonResponse,stimulus:card(title,body),choices:[label],data});
+const select=(name,label,options)=>`<label for="${name}">${label}</label><select id="${name}" name="${name}" required><option value="">请选择</option>${options.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select>`;
+const yn=[['yes','是'],['no','否']];
+const form=(title,html,module,on_finish)=>({type:jsPsychSurveyHtmlForm,preamble:card(title,''),html,button_label:'继续',data:base(module),on_finish});
+const conditional=(test,yes,no=[])=>[{timeline:yes,conditional_function:test},{timeline:no,conditional_function:()=>!test()}];
+const skip=(name)=>info('模块跳过','<p>这一部分不适用于刚才填写的经历，直接进入下一部分。</p>',{...base('skip'),scale_name:name,applicable:0});
+const pending=(name,title,count,detail)=>info(title,`<p>审阅说明：拟用${count}，正式中文条目尚未补齐。本页只呈现模块位置，不要求作答，也不生成量表分数。</p><p>${detail}</p>`,{...base('scale_pending'),scale_name:name,scale_status:'missing_verified_chinese',item_count_planned:count});
 const timeline=[];
-timeline.push({type:jsPsychSurveyHtmlForm,preamble:`<div class="card"><h2>大学生日常活动与娱乐选择研究</h2><p>本研究关注大学生在不同日常情境下的活动选择，约需15—20分钟。答案没有对错，请按照第一反应作答。</p></div>`,html:`<label>测试编号（没有可留空）</label><input name="research_code" type="text"><label>年龄</label><input name="age" type="number" min="18" max="40" required><label>性别</label><select name="gender" required><option value="">请选择</option><option>女</option><option>男</option><option>其他/不愿回答</option></select><label>目前是否为在校大学生？</label><select name="student" required><option value="">请选择</option><option value="yes">是</option><option value="no">否</option></select><p><label><input type="checkbox" name="consent" required> 我已年满18岁，自愿参加本次试测</label></p>`,button_label:"开始",data:{phase:"demographics"}});
-timeline.push({type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><h2>第一部分</h2><p>请想象自己处于接下来的日常情境中，并选择你最可能采取的做法。</p><p class="hint">题目之间没有固定联系，请分别作答。</p></div>`,choices:["开始"],data:{phase:"instruction_a"}});
-
-function addDaily(item,index,total,isFiller=false){const opts=jsPsych.randomization.shuffle(item.options.map(x=>isFiller?{label:x[0],code:x[1],social:null}:{label:x[0],social:x[1],code:x[2]}));timeline.push({type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><div class="progress">${index}/${total}</div><div class="scene">${item.text}</div><div class="question">接下来，你更可能做什么？</div></div>`,choices:opts.map(x=>x.label),data:{phase:"behavior",task:isFiller?"daily_filler":"social_approach",scenario_id:item.id,need_type:item.need||"filler",option_order:opts.map(x=>x.code).join("|")},on_finish:d=>{const c=opts[d.response];d.choice_code=c.code;if(!isFiller)d.seek_social=c.social;}});}
-const dailyOrder=jsPsych.randomization.shuffle([...dailyCritical.map(x=>({...x,isFiller:false})),...dailyFillers.map(x=>({...x,isFiller:true}))]);
-dailyOrder.forEach((x,i)=>addDaily(x,i+1,dailyOrder.length,x.isFiller));
-
-timeline.push({type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><h2>第二部分</h2><p>下面是另一组有关休闲娱乐安排的情境。请继续根据自己的真实习惯选择。</p></div>`,choices:["继续"],data:{phase:"instruction_b"}});
-function addGame(item,index,total,isFiller=false){const opts=jsPsych.randomization.shuffle(item.options.map(x=>({label:x[0],code:x[1]})));timeline.push({type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><div class="progress">${index}/${total}</div><div class="scene">${item.context}</div><div class="question">${item.question}</div></div>`,choices:opts.map(x=>x.label),data:{phase:"behavior",task:isFiller?"game_filler":"game_partner",scenario_id:item.id,option_order:opts.map(x=>x.code).join("|")},on_finish:d=>{d.partner_code=opts[d.response].code;}});}
-const gameOrder=jsPsych.randomization.shuffle([...gameTrials.map(x=>({...x,isFiller:false})),...gameFillers.map(x=>({...x,isFiller:true}))]);
-gameOrder.forEach((x,i)=>addGame(x,i+1,gameOrder.length,x.isFiller));
-
-// 目的察觉必须放在研究问卷之前，以免问卷内容提示研究目的。
-timeline.push({type:jsPsychSurveyHtmlForm,preamble:`<div class="card"><h2>任务体验</h2><p>请根据刚才的实际感受作答。</p></div>`,html:`<label>你认为刚才的任务主要想研究什么？</label><textarea name="purpose_guess" rows="4" required></textarea><label>你作答时是否使用了固定策略？</label><textarea name="strategy" rows="3"></textarea><label>是否有题目让你觉得重复、难懂或不自然？请指出。</label><textarea name="task_feedback" rows="4"></textarea>`,button_label:"继续",data:{phase:"awareness_check"}});
-
-timeline.push({type:jsPsychSurveyHtmlForm,preamble:`<div class="card"><h2>游戏使用情况</h2><p>请根据最近3个月的通常情况填写。</p></div>`,html:`<label>过去12个月是否玩过电子游戏？</label><select name="gaming_12m" required><option value="">请选择</option><option value="yes">是</option><option value="no">否</option></select><label>最近3个月是否玩过电子游戏？</label><select name="gaming_3m" required><option value="">请选择</option><option value="yes">是</option><option value="no">否</option></select><label>平均每周玩游戏多少天？</label><input name="gaming_days_week" type="number" min="0" max="7" required><label>玩游戏的日子里，平均每天多少小时？</label><input name="gaming_hours_day" type="number" min="0" max="24" step="0.5" required><label>最常玩的游戏或类型</label><input name="main_games" type="text" required><label>是否有固定游戏伙伴？</label><select name="fixed_partners" required><option value="">请选择</option><option value="yes">有</option><option value="no">没有</option></select>`,button_label:"继续",data:{phase:"gaming_profile"}});
-
-const f5=["1 从不","2 很少","3 有时","4 经常","5 总是"],a5=["1 非常不同意","2 比较不同意","3 一般","4 比较同意","5 非常同意"];
-const igd=["过去12个月，我常常想着游戏或期待下一次游戏。","当不能玩游戏时，我会感到烦躁、焦虑或难过。","我需要花越来越多时间玩游戏才能感到满足。","我曾试图减少游戏时间，但没有成功。","我因游戏而对其他活动失去兴趣。","即使知道游戏带来问题，我仍继续玩。","我曾向家人或他人隐瞒自己的游戏时间。","我会通过游戏缓解负面情绪。","我曾因游戏危及或失去重要关系、学习或工作机会。"];
-timeline.push({type:jsPsychSurveyLikert,preamble:`<div class="card"><h2>游戏体验</h2><p>请根据过去12个月作答。当前为试测措辞。</p></div>`,questions:igd.map((prompt,i)=>({prompt,labels:f5,required:true,name:`igd${i+1}`})),button_label:"继续",data:{phase:"questionnaire",scale:"IGDS9_pilot"},on_finish:d=>d.igd_total=Object.values(d.response).map(x=>Number(x)+1).reduce((a,b)=>a+b,0)});
-const embed=["我在游戏中有可以稳定联系的人。","我觉得自己属于某个游戏群体或小队。","游戏伙伴会关心我的感受或近况。","与游戏伙伴相处能满足我的社交需要。","游戏中的人际关系对我很重要。","离开常玩的游戏时，我会舍不得其中的人。","即使对游戏内容兴趣下降，我也可能因为伙伴继续上线。","我愿意花时间维持游戏中的关系。"];
-timeline.push({type:jsPsychSurveyLikert,preamble:`<div class="card"><h2>游戏中的关系体验</h2><p>以下是试测题目，请按实际情况作答。</p></div>`,questions:embed.map((prompt,i)=>({prompt,labels:a5,required:true,name:`embed${i+1}`})),button_label:"继续",data:{phase:"questionnaire",scale:"custom_game_embeddedness"},on_finish:d=>d.embed_total=Object.values(d.response).map(x=>Number(x)+1).reduce((a,b)=>a+b,0)});
-const real=["我通常能从现实中的朋友那里获得陪伴。","遇到事情时，我愿意联系现实中认识的人。","我在现实群体中通常能感到自己是其中一员。","和现实中的人相处时，我一般能够自然表达自己。","我拥有可以稳定联系的现实朋友。","现实中的人际关系能够满足我的社交需要。"];
-timeline.push({type:jsPsychSurveyLikert,preamble:`<div class="card"><h2>日常关系体验</h2><p>以下是试测题目，请按实际情况作答。</p></div>`,questions:real.map((prompt,i)=>({prompt,labels:a5,required:true,name:`real${i+1}`})),button_label:"继续",data:{phase:"questionnaire",scale:"custom_real_social_connection"},on_finish:d=>d.real_total=Object.values(d.response).map(x=>Number(x)+1).reduce((a,b)=>a+b,0)});
-
-timeline.push({type:jsPsychSurveyHtmlForm,preamble:`<div class="card"><h2>最后一个问题</h2></div>`,html:`<label>你对情境、选项或程序还有什么建议？</label><textarea name="final_feedback" rows="5"></textarea>`,button_label:"继续",data:{phase:"final_feedback"}});
-timeline.push({type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><h2>谢谢参与</h2><p>点击下方按钮提交本次试测数据。提交后请不要立即关闭页面。</p></div>`,choices:["提交数据"],data:{phase:"end"}});
+timeline.push(info('日常活动与娱乐选择研究',`<p>这是提供给研究者、导师和师姐检查材料的审阅版本，可查看流程并填写修改意见。不是正式招募链接，不作心理诊断。</p><p>尚缺三个正式中文量表模块；游戏关系问卷为待审译稿。所有输入只保留在当前页面，可在最后自行下载，不自动上传。</p><p>请勿输入姓名、学号、手机号或其他可识别个人的信息。可随时关闭页面退出。完整版本时长需要量表补齐后重新实测。</p>`,base('review_intro'),'进入审阅'));
+timeline.push({type:jsPsychHtmlButtonResponse,stimulus:card('自愿试填','<p>你是否已年满18岁，并愿意自愿试填本审阅程序？不愿试填可以直接退出。</p>'),choices:['愿意试填','退出'],data:base('consent'),on_finish:d=>{if(d.response!==0)jsPsych.abortExperiment();}});
+timeline.push(form('基本信息',`<label for="age">年龄</label><input id="age" name="age" type="number" min="18" max="100" required>${select('gender','性别',[['female','女'],['male','男'],['other','其他或不愿回答']])}${select('student','目前是否为在校大学生？',yn)}`,'demographics'));
+timeline.push(info('第一部分 日常选择','<p>请分别想象接下来的情境，选择自己最可能采取的一种做法。各题独立，没有正确答案。</p><p>如果四个选项都不符合你的想法，可以选择“这些都不符合”。本版保留这一试测选项，用于发现材料遗漏。</p>',base('daily_instruction')));
+function task(item,index,total,gameTask=false){
+ const opts=jsPsych.randomization.shuffle(item.options.map(o=>({...o})));
+ opts.push({label:'这些都不符合我的想法',code:'none_fit',social:null});
+ return {type:jsPsychHtmlButtonResponse,stimulus:`<div class="card"><div class="progress">${gameTask?'游戏情境':'日常情境'} ${index+1}/${total} · ${item.id}</div><div class="scene">${item.text}</div><div class="question">在这个情境中，你最可能怎么做？</div></div>`,choices:opts.map(o=>o.label),data:{...base(gameTask?'game_task':'daily_task',item.filler?'filler':gameTask?'partner_source':'social_approach'),scenario_id:item.id,is_filler:Number(item.filler),option_order:opts.map(o=>o.code).join('|')},on_finish:d=>{const o=opts[d.response];d.choice_code=o.code;d.none_fit=Number(o.code==='none_fit');d.seek_social=!gameTask&&!item.filler&&o.code!=='none_fit'?o.social:null;d.partner_source=gameTask&&!item.filler&&o.code!=='none_fit'?o.code:null;}};
+}
+jsPsych.randomization.shuffle(dailyMaterials).forEach((m,i)=>timeline.push(task(m,i,dailyMaterials.length)));
+timeline.push(form('下一部分的适用情况',select('multi','最近3个月，你是否玩过有其他真实玩家参与的多人或联机游戏？仅与电脑角色游玩不算。',yn),'game_eligibility',d=>{state.multi=d.response.multi==='yes';}));
+timeline.push(...conditional(()=>state.multi,[info('第二部分 游戏中的选择','<p>这一部分独立于刚才的日常题，不是对上一题选择的追问。请根据实际游戏习惯作答。</p><p>“游戏外原本认识的朋友”：最初通过同学、同事或其他非游戏途径认识。“游戏里认识的熟人”：最初因一起玩游戏而认识，即使后来线下见过面，也归在这里。</p><p>“不专门找伙伴”包括让系统自动匹配；“主动招募”指自己发消息、联系或加入招募队伍。没有相应朋友时，不必选择该项。</p>',base('game_instruction')),...jsPsych.randomization.shuffle(gameMaterials).map((m,i)=>task(m,i,gameMaterials.length,true))],[skip('game_task')]));
+timeline.push(form('任务体验',`<label for="purpose">你觉得刚才的任务主要想研究什么？不知道也可以直接写“不知道”。</label><textarea id="purpose" name="purpose_guess" required></textarea><label for="strategy">是否采用了固定的选择策略？</label><textarea id="strategy" name="strategy"></textarea><label for="feedback">哪些题重复、难懂，或者四个选项都不合适？尽量填写题号以及你实际想做的事。</label><textarea id="feedback" name="task_feedback"></textarea>`,'awareness_check'));
+timeline.push(form('游戏使用情况',select('gaming_12m','过去12个月是否玩过电子游戏？',yn)+select('gaming_3m','最近3个月是否玩过电子游戏？',yn),'gaming_profile',d=>{state.g12=d.response.gaming_12m==='yes';state.g3=d.response.gaming_3m==='yes';d.profile_inconsistent=Number((state.g3&&!state.g12)||(state.multi&&!state.g3));}));
+timeline.push(...conditional(()=>state.g3,[form('近期游戏习惯',`<label for="days">通常每周有几天玩游戏？</label><input id="days" name="gaming_days_week" type="number" min="0" max="7" required><label for="hours">玩游戏的日子里，平均每天玩多少小时？</label><input id="hours" name="gaming_hours_day" type="number" min="0" max="24" step="0.1" required><label for="games">常玩的游戏或类型（不填写游戏账号）</label><input id="games" name="main_games" required>${select('fixed_partners','是否有固定游戏伙伴？',yn)}`,'gaming_details')]));
+timeline.push(...conditional(()=>state.g12,[pending('IGDS9_SF','游戏体验问卷',9,'拟测过去12个月的游戏障碍症状倾向，采用连续得分。旧版九道试测措辞不当作正式中文版。')],[skip('IGDS9_SF')]));
+timeline.push(...conditional(()=>state.g3,[pending('CMOGQ_Escape','游戏动机问卷',4,'拟关注逃避动机。需补齐作者中文条目与指导语；仅使用四题子量表还是完整27题，还需要导师确认。')],[skip('CMOGQ_Escape')]));
+timeline.push(...conditional(()=>state.multi&&state.g3,[form('游戏中的交往经历',select('relations','最近3个月，你是否在某款游戏中与其他玩家有过交流或合作，而不只是系统匹配到同一局？',yn),'relationship_eligibility',d=>{state.relations=d.response.relations==='yes';})]));
+const relationBlock=[form('确定后续问卷的参照游戏','<p>请填写最近3个月最常玩、且与其他玩家有交流或合作的一款游戏。后面七题都以这一款游戏为准，不要在题目之间更换参照。</p><label for="reference_game">游戏名称（不填账号）</label><input id="reference_game" name="reference_game" required>','reference_game',d=>{state.reference=d.response.reference_game;})];
+for(const scale of draftScales){
+ relationBlock.push(info(scale.title,'<p>审阅说明：以下为依据原英文条目制作的中文译稿，尚未完成翻译核对和中文验证。本版暂用五点评分，评分设置同样待核对；只用于检查理解和呈现。</p>',{...base('scale_instruction'),scale_name:scale.name,scale_status:'translation_draft'}));
+ scale.items.forEach((prompt,i)=>relationBlock.push({type:jsPsychHtmlButtonResponse,stimulus:()=>card(scale.title,`<p class="small">参照游戏：${escapeHTML(state.reference)} · ${i+1}/${scale.items.length}</p><p class="scene">${prompt}</p>`),choices:['非常不同意','比较不同意','一般','比较同意','非常同意','不适用或无法判断'],data:{...base('scale_item',scale.name),scale_name:scale.name,item_name:`${scale.name}_${i+1}`,scale_status:'translation_draft'},on_finish:d=>{d.reference_game=state.reference;d.item_value=d.response<5?d.response+1:null;d.applicable=Number(d.response<5);}}));
+}
+timeline.push(...conditional(()=>state.multi&&state.g3&&state.relations,relationBlock,[skip('SOC_RSC')]));
+timeline.push(pending('SCS_Chinese_Wu2022','日常社会联结问卷',9,'拟用吴才智等（2022）的中文修订版本，完整条目、题数、指导语和反向计分键仍需最终核对。不能从其他18题或20题版本中自行挑九题替代；一般社会联结也不能未经说明就等同于纯线下联结。'));
+timeline.push(form('整体审阅意见','<label for="final">对研究内容、选项、问卷或页面显示还有什么建议？</label><textarea id="final" name="final_feedback"></textarea>','final_feedback'));
+timeline.push({type:jsPsychHtmlButtonResponse,stimulus:card('结束审阅','<p>点击后结束当前审阅流程，可以下载本地记录。本版不会自动上传数据。</p>'),choices:['完成审阅'],data:base('review_end'),on_finish:d=>{
+ state.complete=true;jsPsych.data.addProperties({session_complete:1,completed_at:new Date().toISOString()});d.session_complete=1;
+ for(const s of draftScales){const rows=jsPsych.data.get().filter({scale_name:s.name,module:'scale_item'}).values();const values=rows.filter(r=>r.item_value!=null).map(r=>r.item_value);d[`${s.name}_n_valid`]=values.length;d[`${s.name}_total`]=values.length===s.items.length?values.reduce((a,b)=>a+b,0):null;d[`${s.name}_mean`]=values.length===s.items.length?values.reduce((a,b)=>a+b,0)/values.length:null;}
+}});
 jsPsych.run(timeline);
